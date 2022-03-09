@@ -3,6 +3,7 @@ package suite
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"reflect"
 	"regexp"
@@ -81,7 +82,7 @@ func (suite *Suite) Run(name string, subtest func()) bool {
 // Run takes a testing suite and runs all of the tests attached
 // to it.
 func Run(t *testing.T, suite TestingSuite) {
-	defer fmt.Println("debug lim", 11111, assert.CallerInfo())
+	defer log.Default().Println("debug lim")
 	defer failOnPanic(t)
 
 	suite.SetT(t)
