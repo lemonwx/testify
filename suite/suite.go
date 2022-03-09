@@ -145,30 +145,49 @@ func Run(t *testing.T, suite TestingSuite) {
 						passed := !t.Failed()
 						stats.end(method.Name, passed)
 					}
+					log.Default().Println(stats, stats)
 
 					if afterTestSuite, ok := suite.(AfterTest); ok {
+						log.Default().Println(stats, stats)
 						afterTestSuite.AfterTest(suiteName, method.Name)
+						log.Default().Println(stats, stats)
 					}
 
+					log.Default().Println(stats, stats)
 					if tearDownTestSuite, ok := suite.(TearDownTestSuite); ok {
+						log.Default().Println(stats, stats)
 						tearDownTestSuite.TearDownTest()
+						log.Default().Println(stats, stats)
 					}
 
+					log.Default().Println(stats, stats)
 					suite.SetT(parentT)
+					log.Default().Println(stats, stats)
 				}()
 
+				log.Default().Println(stats, stats)
 				if setupTestSuite, ok := suite.(SetupTestSuite); ok {
+					log.Default().Println(stats, stats)
 					setupTestSuite.SetupTest()
+					log.Default().Println(stats, stats)
 				}
+				log.Default().Println(stats, stats)
 				if beforeTestSuite, ok := suite.(BeforeTest); ok {
+					log.Default().Println(stats, stats)
 					beforeTestSuite.BeforeTest(methodFinder.Elem().Name(), method.Name)
+					log.Default().Println(stats, stats)
 				}
 
+				log.Default().Println(stats, stats)
 				if stats != nil {
+					log.Default().Println(stats, stats)
 					stats.start(method.Name)
+					log.Default().Println(stats, stats)
 				}
+				log.Default().Println(stats, stats)
 
 				method.Func.Call([]reflect.Value{reflect.ValueOf(suite)})
+				log.Default().Println(stats, stats)
 			},
 		}
 		tests = append(tests, test)
