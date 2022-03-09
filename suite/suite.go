@@ -82,6 +82,7 @@ func (suite *Suite) Run(name string, subtest func()) bool {
 // Run takes a testing suite and runs all of the tests attached
 // to it.
 func Run(t *testing.T, suite TestingSuite) {
+	log.SetFlags(log.Llongfile)
 	defer log.Default().Println("debug lim")
 	defer failOnPanic(t)
 
