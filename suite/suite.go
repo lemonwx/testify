@@ -194,14 +194,18 @@ func Run(t *testing.T, suite TestingSuite) {
 	}
 	if suiteSetupDone {
 		defer func() {
+			log.Default().Println("down")
 			if tearDownAllSuite, ok := suite.(TearDownAllSuite); ok {
+				log.Default().Println("down")
 				tearDownAllSuite.TearDownSuite()
+				log.Default().Println("down")
 			}
 
 			if suiteWithStats, measureStats := suite.(WithStats); measureStats {
 				stats.End = time.Now()
 				suiteWithStats.HandleStats(suiteName, stats)
 			}
+			log.Default().Println("down")
 		}()
 	}
 	log.Default().Println("1", tests)
