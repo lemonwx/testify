@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/petermattis/goid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -83,6 +84,7 @@ func (suite *Suite) Run(name string, subtest func()) bool {
 // to it.
 func Run(t *testing.T, suite TestingSuite) {
 	log.SetFlags(log.Llongfile)
+	log.SetPrefix(fmt.Sprintf("[%d]", goid.Get()))
 	log.Default().Println("1")
 	defer failOnPanic(t)
 	log.Default().Println("1")
