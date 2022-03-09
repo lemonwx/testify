@@ -183,9 +183,9 @@ func Run(t *testing.T, suite TestingSuite) {
 			}
 		}()
 	}
-	log.Default().Println("1")
+	log.Default().Println("1", tests)
 	runTests(t, tests)
-	log.Default().Println("1")
+	log.Default().Println("1", tests)
 }
 
 // Filtering method according to set regular expression
@@ -198,22 +198,29 @@ func methodFilter(name string) (bool, error) {
 }
 
 func runTests(t testing.TB, tests []testing.InternalTest) {
+	log.Default().Println("1", tests)
 	if len(tests) == 0 {
 		t.Log("warning: no tests to run")
 		return
 	}
 
 	r, ok := t.(runner)
+	log.Default().Println("1", tests,ok)
 	if !ok { // backwards compatibility with Go 1.6 and below
 		if !testing.RunTests(allTestsFilter, tests) {
+			log.Default().Println("1", tests)
 			t.Fail()
 		}
 		return
 	}
 
+	log.Default().Println("1", tests)
 	for _, test := range tests {
+		log.Default().Println("1", test)
 		r.Run(test.Name, test.F)
+		log.Default().Println("1", test)
 	}
+	log.Default().Println("1", test)
 }
 
 type runner interface {
