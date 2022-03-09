@@ -220,7 +220,7 @@ func runTests(t testing.TB, tests []testing.InternalTest) {
 		r.Run(test.Name, test.F)
 		log.Default().Println("1", test)
 	}
-	log.Default().Println("1", test)
+	log.Default().Println("1", tests)
 }
 
 type runner interface {
