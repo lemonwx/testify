@@ -83,7 +83,7 @@ func (suite *Suite) Run(name string, subtest func()) bool {
 // to it.
 func Run(t *testing.T, suite TestingSuite) {
 	log.SetFlags(log.Llongfile)
-	defer log.Default().Println("debug lim")
+	defer log.Default().Println("debug lim", assert.CallerInfo())
 	defer failOnPanic(t)
 
 	suite.SetT(t)
