@@ -83,8 +83,9 @@ func (suite *Suite) Run(name string, subtest func()) bool {
 // to it.
 func Run(t *testing.T, suite TestingSuite) {
 	log.SetFlags(log.Llongfile)
-	defer log.Default().Println("debug lim", assert.CallerInfo())
+	log.Default().Println("1")
 	defer failOnPanic(t)
+	log.Default().Println("1")
 
 	suite.SetT(t)
 
@@ -95,14 +96,17 @@ func Run(t *testing.T, suite TestingSuite) {
 		stats = newSuiteInformation()
 	}
 
+	log.Default().Println("1")
 	tests := []testing.InternalTest{}
 	methodFinder := reflect.TypeOf(suite)
 	suiteName := methodFinder.Elem().Name()
 
+	log.Default().Println("1", methodFinder.NumMethod())
 	for i := 0; i < methodFinder.NumMethod(); i++ {
 		method := methodFinder.Method(i)
 
 		ok, err := methodFilter(method.Name)
+		log.Default().Println("1", i, methodFinder.NumMethod(), ok,err, method.Name, )
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "testify: invalid regexp for -m: %s\n", err)
 			os.Exit(1)
@@ -112,17 +116,21 @@ func Run(t *testing.T, suite TestingSuite) {
 			continue
 		}
 
+		log.Default().Println("set up", suiteSetupDone)
 		if !suiteSetupDone {
 			if stats != nil {
 				stats.Start = time.Now()
 			}
 
 			if setupAllSuite, ok := suite.(SetupAllSuite); ok {
+				log.Default().Println("set up", suiteSetupDone)
 				setupAllSuite.SetupSuite()
+				log.Default().Println("set up", suiteSetupDone)
 			}
 
 			suiteSetupDone = true
 		}
+		log.Default().Println("set up", suiteSetupDone)
 
 		test := testing.InternalTest{
 			Name: method.Name,
@@ -175,8 +183,9 @@ func Run(t *testing.T, suite TestingSuite) {
 			}
 		}()
 	}
-
+	log.Default().Println("1")
 	runTests(t, tests)
+	log.Default().Println("1")
 }
 
 // Filtering method according to set regular expression
