@@ -81,7 +81,7 @@ func (suite *Suite) Run(name string, subtest func()) bool {
 // Run takes a testing suite and runs all of the tests attached
 // to it.
 func Run(t *testing.T, suite TestingSuite) {
-	defer fmt.Println(11111)
+	defer fmt.Println(11111, assert.CallerInfo())
 	defer failOnPanic(t)
 
 	suite.SetT(t)
