@@ -84,13 +84,12 @@ func (suite *Suite) Run(name string, subtest func()) bool {
 // to it.
 func Run(t *testing.T, suite TestingSuite) {
 	log.SetFlags(log.Llongfile)
-	log.SetPrefix(fmt.Sprintf("[%d]", goid.Get()))
-	log.Default().Println("start", suite.T().Name())
-	defer log.Default().Println("end", suite.T().Name())
+
 	defer failOnPanic(t)
 
 	suite.SetT(t)
-
+	log.Default().Println("start", goid.Get(), suite.T().Name())
+	defer log.Default().Println("end", goid.Get(), suite.T().Name())
 	var suiteSetupDone bool
 
 	var stats *SuiteInformation
@@ -106,7 +105,7 @@ func Run(t *testing.T, suite TestingSuite) {
 		method := methodFinder.Method(i)
 
 		ok, err := methodFilter(method.Name)
-		log.Default().Println("1", i, methodFinder.NumMethod(), ok,err, suite.T().Name(), suiteName, method.Name, )
+		log.Default().Println(goid.Get(), i, methodFinder.NumMethod(), ok,err, suite.T().Name(), suiteName, method.Name, )
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "testify: invalid regexp for -m: %s\n", err)
 			os.Exit(1)
@@ -161,17 +160,17 @@ func Run(t *testing.T, suite TestingSuite) {
 				if stats != nil {
 					stats.start(method.Name)
 				}
-				log.Default().Println("begin", suite.T().Name(), method.Name)
+				log.Default().Println(goid.Get(), "begin", suite.T().Name(), method.Name)
 				method.Func.Call([]reflect.Value{reflect.ValueOf(suite)})
-				log.Default().Println("begin", suite.T().Name(), method.Name)
+				log.Default().Println(goid.Get(), "begin", suite.T().Name(), method.Name)
 			},
 		}
 		tests = append(tests, test)
 	}
 	if suiteSetupDone {
 		defer func() {
-			log.Default().Println(suite.T().Name(), "start defer down")
-			defer log.Default().Println(suite.T().Name(), "end defer down")
+			log.Default().Println(goid.Get(), suite.T().Name(), "start defer down")
+			defer log.Default().Println(goid.Get(), suite.T().Name(), "end defer down")
 			if tearDownAllSuite, ok := suite.(TearDownAllSuite); ok {
 				tearDownAllSuite.TearDownSuite()
 			}
@@ -195,8 +194,8 @@ func methodFilter(name string) (bool, error) {
 }
 
 func runTests(t testing.TB, tests []testing.InternalTest) {
-	log.Default().Println("start", tests)
-	defer log.Default().Println("finish", tests)
+	log.Default().Println(goid.Get(), "start", tests)
+	defer log.Default().Println(goid.Get(), "finish", tests)
 	if len(tests) == 0 {
 		t.Log("warning: no tests to run")
 		return
@@ -205,16 +204,16 @@ func runTests(t testing.TB, tests []testing.InternalTest) {
 	r, ok := t.(runner)
 	if !ok { // backwards compatibility with Go 1.6 and below
 		if !testing.RunTests(allTestsFilter, tests) {
-			log.Default().Println("1", tests)
+			log.Default().Println(goid.Get(), tests)
 			t.Fail()
 		}
 		return
 	}
 
 	for _, test := range tests {
-		log.Default().Println("start", test)
+		log.Default().Println(goid.Get(),"start", test)
 		r.Run(test.Name, test.F)
-		log.Default().Println("end", test)
+		log.Default().Println(goid.Get(), "end", test)
 	}
 }
 
