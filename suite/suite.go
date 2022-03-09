@@ -85,9 +85,9 @@ func (suite *Suite) Run(name string, subtest func()) bool {
 func Run(t *testing.T, suite TestingSuite) {
 	log.SetFlags(log.Llongfile)
 	log.SetPrefix(fmt.Sprintf("[%d]", goid.Get()))
-	log.Default().Println("1")
+	log.Default().Println("start", suite.T().Name())
+	defer log.Default().Println("end", suite.T().Name())
 	defer failOnPanic(t)
-	log.Default().Println("1")
 
 	suite.SetT(t)
 
@@ -98,17 +98,15 @@ func Run(t *testing.T, suite TestingSuite) {
 		stats = newSuiteInformation()
 	}
 
-	log.Default().Println("1")
 	tests := []testing.InternalTest{}
 	methodFinder := reflect.TypeOf(suite)
 	suiteName := methodFinder.Elem().Name()
 
-	log.Default().Println("1", methodFinder.NumMethod())
 	for i := 0; i < methodFinder.NumMethod(); i++ {
 		method := methodFinder.Method(i)
 
 		ok, err := methodFilter(method.Name)
-		log.Default().Println("1", i, methodFinder.NumMethod(), ok,err, method.Name, )
+		log.Default().Println("1", i, methodFinder.NumMethod(), ok,err, suite.T().Name(), suiteName, method.Name, )
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "testify: invalid regexp for -m: %s\n", err)
 			os.Exit(1)
@@ -118,21 +116,17 @@ func Run(t *testing.T, suite TestingSuite) {
 			continue
 		}
 
-		log.Default().Println("set up", suiteSetupDone)
 		if !suiteSetupDone {
 			if stats != nil {
 				stats.Start = time.Now()
 			}
 
 			if setupAllSuite, ok := suite.(SetupAllSuite); ok {
-				log.Default().Println("set up", suiteSetupDone)
 				setupAllSuite.SetupSuite()
-				log.Default().Println("set up", suiteSetupDone)
 			}
 
 			suiteSetupDone = true
 		}
-		log.Default().Println("set up", suiteSetupDone)
 
 		test := testing.InternalTest{
 			Name: method.Name,
@@ -145,72 +139,50 @@ func Run(t *testing.T, suite TestingSuite) {
 						passed := !t.Failed()
 						stats.end(method.Name, passed)
 					}
-					log.Default().Println(stats, stats)
 
 					if afterTestSuite, ok := suite.(AfterTest); ok {
-						log.Default().Println(stats, stats)
 						afterTestSuite.AfterTest(suiteName, method.Name)
-						log.Default().Println(stats, stats)
 					}
 
-					log.Default().Println(stats, stats)
 					if tearDownTestSuite, ok := suite.(TearDownTestSuite); ok {
-						log.Default().Println(stats, stats)
 						tearDownTestSuite.TearDownTest()
-						log.Default().Println(stats, stats)
 					}
 
-					log.Default().Println(stats, stats)
 					suite.SetT(parentT)
-					log.Default().Println(stats, stats)
 				}()
 
-				log.Default().Println(stats, stats)
 				if setupTestSuite, ok := suite.(SetupTestSuite); ok {
-					log.Default().Println(stats, stats)
 					setupTestSuite.SetupTest()
-					log.Default().Println(stats, stats)
 				}
-				log.Default().Println(stats, stats)
 				if beforeTestSuite, ok := suite.(BeforeTest); ok {
-					log.Default().Println(stats, stats)
 					beforeTestSuite.BeforeTest(methodFinder.Elem().Name(), method.Name)
-					log.Default().Println(stats, stats)
 				}
 
-				log.Default().Println(stats, stats)
 				if stats != nil {
-					log.Default().Println(stats, stats)
 					stats.start(method.Name)
-					log.Default().Println(stats, stats)
 				}
-				log.Default().Println(stats, stats)
-
+				log.Default().Println("begin", suite.T().Name(), method.Name)
 				method.Func.Call([]reflect.Value{reflect.ValueOf(suite)})
-				log.Default().Println(stats, stats)
+				log.Default().Println("begin", suite.T().Name(), method.Name)
 			},
 		}
 		tests = append(tests, test)
 	}
 	if suiteSetupDone {
 		defer func() {
-			log.Default().Println("down")
+			log.Default().Println(suite.T().Name(), "start defer down")
+			defer log.Default().Println(suite.T().Name(), "end defer down")
 			if tearDownAllSuite, ok := suite.(TearDownAllSuite); ok {
-				log.Default().Println("down")
 				tearDownAllSuite.TearDownSuite()
-				log.Default().Println("down")
 			}
 
 			if suiteWithStats, measureStats := suite.(WithStats); measureStats {
 				stats.End = time.Now()
 				suiteWithStats.HandleStats(suiteName, stats)
 			}
-			log.Default().Println("down")
 		}()
 	}
-	log.Default().Println("1", tests)
 	runTests(t, tests)
-	log.Default().Println("1", tests)
 }
 
 // Filtering method according to set regular expression
@@ -223,14 +195,14 @@ func methodFilter(name string) (bool, error) {
 }
 
 func runTests(t testing.TB, tests []testing.InternalTest) {
-	log.Default().Println("1", tests)
+	log.Default().Println("start", tests)
+	defer log.Default().Println("finish", tests)
 	if len(tests) == 0 {
 		t.Log("warning: no tests to run")
 		return
 	}
 
 	r, ok := t.(runner)
-	log.Default().Println("1", tests,ok)
 	if !ok { // backwards compatibility with Go 1.6 and below
 		if !testing.RunTests(allTestsFilter, tests) {
 			log.Default().Println("1", tests)
@@ -239,13 +211,11 @@ func runTests(t testing.TB, tests []testing.InternalTest) {
 		return
 	}
 
-	log.Default().Println("1", tests)
 	for _, test := range tests {
-		log.Default().Println("1", test)
+		log.Default().Println("start", test)
 		r.Run(test.Name, test.F)
-		log.Default().Println("1", test)
+		log.Default().Println("end", test)
 	}
-	log.Default().Println("1", tests)
 }
 
 type runner interface {
